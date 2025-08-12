@@ -27,7 +27,7 @@ int main()
     while (true) 
     {
         // update inputs
-        xbox.Update();
+        xbox.update();
         buttons = xbox.buttons;
         
         // print the values
@@ -80,7 +80,7 @@ int main()
         if (kill_robot) 
         {
             std::cout << "Kill robot command received!" << std::endl;
-            xbox.ShutDownCmd(); // Set the shutdown command to true
+            return 0; // Exit the program
         }
 
         usleep(10000); // Sleep for 50ms to avoid excessive CPU usage

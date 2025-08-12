@@ -7,12 +7,7 @@ Joystick::Joystick()
 
     if (devicePath.empty()) 
     {
-        std::cerr << "Joystick not found" << std::endl;
-
-        // Set the shudown flag to true
-        std::cerr << "Shutting down ..." << std::endl;
-        shut_down_ = true;
-
+        std::cerr << "No joystick found." << std::endl;
         return;
     }
 
@@ -21,6 +16,11 @@ Joystick::Joystick()
     if (fd < 0) 
     {
         std::cerr << "Error opening device file: " << devicePath << " - " << strerror(errno) << std::endl;
+    }
+    else 
+    {
+        std::cout << "Joystick connected: [" << devicePath << "]" << std::endl;
+        this->joy_connected = true; // Set the connection status to true
     }
 }
 
@@ -33,9 +33,9 @@ Joystick::~Joystick()
     }
 }
 
-void Joystick::Update() 
-{
-    //std::cout << "Updating" << std::endl;
+void Joystick::update() 
+{   
+    // Check if the joystick is connected
     if (fd < 0) {
         //std::cerr << "Device file not open" << std::endl;
         return;
@@ -49,50 +49,48 @@ void Joystick::Update()
         {
             switch (ev.code) 
             {
-                case ABS_Y:  
+                case ABS_X:  // Left Stick X-axis (LS_X)
                 {
-                    double value = (double) ev.value;
-                    double v_x_raw = -value / val_max_;
-                    if(fabs(v_x_raw) < this->val_threshold_) 
-                    {
-                        v_x_raw = 0.0;
-                    }
-                    this->v_x_ = v_x_raw;
+                    this->LS_X = (double) ev.value / this->stick_value_max;
+                    this->LS_X = (fabs(this->LS_X) < this->val_deadzone) ? 0.0 : this->LS_X;
                     break;
                 }
-                case ABS_RX: 
+                case ABS_Y:  // Left Stick Y-axis (LS_Y)
                 {
-                    double value = (double) ev.value;
-                    double v_y_raw = -value / val_max_;
-                    if(fabs(v_y_raw) < this->val_threshold_) 
-                    {
-                        v_y_raw = 0.0;
-                    }
-                    this->v_y_ = v_y_raw;
+                    this->LS_Y = -(double) ev.value / this->stick_value_max; 
+                    this->LS_Y = (fabs(this->LS_Y) < this->val_deadzone) ? 0.0 : this->LS_Y;
                     break;
                 }
-                // RT and LT
-                case ABS_RZ:
+                case ABS_RX: // Right Stick X-axis (RS_X)
                 {
-                    double value = (double) ev.value;
-                    double w_z_raw = -value / this->w_z_max_;
-                    if(fabs(w_z_raw) < this->val_threshold_) 
-                    {
-                        w_z_raw = 0.0;
-                    }
-                    this->w_z_ = w_z_raw;
+                    this->RS_X = (double) ev.value / this->stick_value_max;
+                    this->RS_X = (fabs(this->RS_X) < this->val_deadzone) ? 0.0 : this->RS_X;
                     break;
                 }
-                // Left trigger
-                case ABS_Z:
+                case ABS_RY: // Right Stick Y-axis (RS_Y)
                 {
-                    double value = (double) ev.value;
-                    double w_z_raw = value / this->w_z_max_;
-                    if(fabs(w_z_raw) < this->val_threshold_) 
-                    {
-                        w_z_raw = 0.0;
-                    }
-                    this->w_z_ = w_z_raw;
+                    this->RS_Y = -(double) ev.value / this->stick_value_max;
+                    this->RS_Y = (fabs(this->RS_Y) < this->val_deadzone) ? 0.0 : this->RS_Y;
+                    break;
+                }
+                case ABS_Z:  // Left Trigger (LT)
+                {
+                    this->LT = (double) ev.value / this->trigg_value_max;
+                    break;
+                }
+                case ABS_RZ: // Right Trigger (RT)
+                {
+                    this->RT = (double) ev.value / this->trigg_value_max;
+                    break;
+                }
+                case ABS_HAT0X: // D-Pad Left/Right
+                {
+                    this->DPAD_X = (double) ev.value;
+                    break;
+                }
+                case ABS_HAT0Y: // D-Pad Up/Down
+                {
+                    this->DPAD_Y = -(double) ev.value;
                     break;
                 }
             }
@@ -141,6 +139,16 @@ void Joystick::Update()
         }
     }
 
+    // build the axes struct
+    this->axes.LS_X = this->LS_X;
+    this->axes.LS_Y = this->LS_Y;
+    this->axes.RS_X = this->RS_X;
+    this->axes.RS_Y = this->RS_Y;
+    this->axes.LT = this->LT;
+    this->axes.RT = this->RT;
+    this->axes.DPAD_X = this->DPAD_X;
+    this->axes.DPAD_Y = this->DPAD_Y;
+
     // build the buttons struct
     this->buttons.A = this->A;
     this->buttons.B = this->B;
@@ -152,13 +160,13 @@ void Joystick::Update()
     this->buttons.START = this->START;
     this->buttons.XBOX = this->XBOX;
 
+    // Check if the joystick is still connected
     ssize_t n = read(fd, &ev, sizeof(ev));
-
     if (n == -1) {
         if (errno == ENODEV) 
         {
             std::cerr << "Controller disconnected (ENODEV)" << std::endl;
-            this->shut_down_ = true;
+            this->joy_connected = false; // Set the connection status to false
         }
     }
 }

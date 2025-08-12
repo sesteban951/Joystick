@@ -11,19 +11,44 @@ int main()
 
     Joystick xbox;
 
-    while (true) 
+    // axes and buttons
+    Buttons buttons;
+    Axes axes;
+
+    // if joystick is connected, start reading inputs
+    if (xbox.isConnected())
     {
-        xbox.Update();
-        
-        std::cout << "X: " << xbox.CmdX() << " Y: " << xbox.CmdY() << " Z: " << xbox.CmdZ() << std::endl;
-
-        if(xbox.ShutDownCmd() == true) 
+        while (true) 
         {
-            std::cout << "Xbox button pressed!" << std::endl;
-            return 0;
-        }
+            xbox.update();
 
-        usleep(10000); // Sleep for 50ms to avoid excessive CPU usage
+            buttons = xbox.buttons;
+            axes = xbox.axes;
+
+            std::cout << "LS: (" << axes.LS_X << ", " << axes.LS_Y << "), "
+                    << "RS: (" << axes.RS_X << ", " << axes.RS_Y << "), "
+                    << "LT: " << axes.LT << ", "
+                    << "RT: " << axes.RT << ", "
+                    << "DPAD: (" << axes.DPAD_X << ", " << axes.DPAD_Y << "), "
+                    << "A: " << buttons.A << ", "
+                    << "B: " << buttons.B << ", "
+                    << "X: " << buttons.X << ", "
+                    << "Y: " << buttons.Y << ", "
+                    << "LB: " << buttons.LB << ", "
+                    << "RB: " << buttons.RB << ", "
+                    << "SELECT: " << buttons.SELECT << ", "
+                    << "START: " << buttons.START << ", "
+                    << "XBOX: " << buttons.XBOX
+                    << std::endl;
+
+            if (!xbox.isConnected())
+            {
+                std::cout << "Joystick disconnected." << std::endl;
+                break;
+            }
+
+            usleep(10000); // Sleep for 1ms to avoid excessive CPU usage
+        }
     }
 
     return 0;
