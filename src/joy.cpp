@@ -1,13 +1,13 @@
-#include "joystick/xbox_controller.h"
+#include "joy.h"
 
-XboxController::XboxController() 
+Joystick::Joystick() 
 {
-    // Find the Xbox controller device path
-    std::string devicePath = FindXboxController();
+    // Find the joystick controller device path
+    std::string devicePath = FindJoystick();
 
     if (devicePath.empty()) 
     {
-        std::cerr << "Xbox controller not found" << std::endl;
+        std::cerr << "Joystick not found" << std::endl;
 
         // Set the shudown flag to true
         std::cerr << "Shutting down ..." << std::endl;
@@ -16,7 +16,7 @@ XboxController::XboxController()
         return;
     }
 
-
+    // Open the joystick device file
     fd = open(devicePath.c_str(), O_RDONLY | O_NONBLOCK); // Open in non-blocking mode
     if (fd < 0) 
     {
@@ -24,15 +24,16 @@ XboxController::XboxController()
     }
 }
 
-XboxController::~XboxController() 
+Joystick::~Joystick() 
 {
+    // close the file descriptor if it was opened
     if (fd >= 0) 
     {
         close(fd);
     }
 }
 
-void XboxController::Update() 
+void Joystick::Update() 
 {
     //std::cout << "Updating" << std::endl;
     if (fd < 0) {
@@ -100,120 +101,44 @@ void XboxController::Update()
         // button press
         if (ev.type == EV_KEY) 
         {
-
             switch (ev.code) {
-                case BTN_MODE:  // Sometimes called KEY_MODE or KEY_XBOX
-                {
-                    if (ev.value == 1) // 1 = pressed, 0 = released, 2 = held
-                    {
-                        // xbox button pressed
-                        this->XBOX = true;
-                    }
-                    else {
-                        // xbox button released
-                        this->XBOX = false;
-                    }
+                case BTN_MODE:    // Sometimes called KEY_MODE or KEY_XBOX
+                    this->XBOX = (ev.value == 1); 
                     break;
-                }
-                case BTN_SOUTH: // A button
-                {
-                    if (ev.value == 1) 
-                    {
-                        this->A = true;
-                    }
-                    else 
-                    {
-                        this->A = false;
-                    }
+
+                case BTN_SOUTH:   // A button
+                    this->A = (ev.value == 1); 
                     break;
-                }
-                case BTN_EAST: // B button
-                {
-                    if (ev.value == 1) 
-                    {
-                        this->B = true;
-                    }
-                    else 
-                    {
-                        this->B = false;
-                    }
+
+                case BTN_EAST:    // B button
+                    this->B = (ev.value == 1); 
                     break;
-                }
-                case BTN_NORTH: // X button
-                {
-                    if (ev.value == 1) 
-                    {                        
-                        this->X = true;
-                    }
-                    else 
-                    {
-                        this->X = false;
-                    }
+
+                case BTN_NORTH:   // X button
+                    this->X = (ev.value == 1); 
                     break;
-                }
-                case BTN_WEST: // Y button
-                {
-                    if (ev.value == 1) 
-                    {
-                        this->Y = true;
-                    }
-                    else 
-                    {
-                        this->Y = false;
-                    }
+
+                case BTN_WEST:    // Y button
+                    this->Y = (ev.value == 1); 
                     break;
-                }
-                case BTN_TL: // Left Bumper
-                {
-                    if (ev.value == 1) 
-                    {
-                        this->LB = true;
-                    }
-                    else 
-                    {
-                        this->LB = false;
-                    }
+
+                case BTN_TL:      // Left Bumper
+                    this->LB = (ev.value == 1); 
                     break;
-                }
-                case BTN_TR: // Right Bumper
-                {
-                    if (ev.value == 1) 
-                    {
-                        this->RB = true;
-                    }
-                    else 
-                    {
-                        this->RB = false;
-                    }
+
+                case BTN_TR:      // Right Bumper
+                    this->RB = (ev.value == 1); 
                     break;
-                }
-                case BTN_SELECT: // select button
-                {
-                    if (ev.value == 1) 
-                    {
-                        this->SELECT = true;
-                    }
-                    else 
-                    {
-                        this->SELECT = false;
-                    }
+
+                case BTN_SELECT:  // select button
+                    this->SELECT = (ev.value == 1); 
                     break;
-                }
-                case BTN_START: // start button
-                {
-                    if (ev.value == 1) 
-                    {
-                        this->START = true;
-                    }
-                    else 
-                    {
-                        this->START = false;
-                    }
+
+                case BTN_START:   // start button
+                    this->START = (ev.value == 1); 
                     break;
-                }
             }
         }
-
     }
 
     // build the buttons struct
@@ -238,18 +163,18 @@ void XboxController::Update()
     }
 }
 
-std::string XboxController::FindXboxController() 
+std::string Joystick::FindJoystick() 
 {
     for (const auto& name : knownNames) 
     {
-        std::string path = FindXboxController(name);
+        std::string path = FindJoystick(name);
         if (!path.empty())
             return path;
     }
     return "";
 }
 
-std::string XboxController::FindXboxController(const std::string& target_name) 
+std::string Joystick::FindJoystick(const std::string& target_name) 
 {
     std::string basePath = "/dev/input/";
 

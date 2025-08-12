@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -pthread -O3 -pthread -shared -Wl,-soname,libg1_joystick.so -o libg1_joystick.so CMakeFiles/g1_joystick.dir/src/joy.cpp.o 

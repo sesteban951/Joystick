@@ -17,7 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Create a controller library
 add_library(g1_joystick SHARED
-    src/xbox_controller.cpp
+    src/joy.cpp
 )
 
 # Link the libraries to the g1_controller library

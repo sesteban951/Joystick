@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -pthread -O3 -pthread CMakeFiles/xbox_controller_test.dir/tests/xbox_controller_test.cpp.o -o xbox_controller_test   -L/home/sergio/projects/Joystick/G1-Joystick/include  -Wl,-rpath,/home/sergio/projects/Joystick/G1-Joystick/include:/home/sergio/projects/Joystick/build libg1_joystick.so 

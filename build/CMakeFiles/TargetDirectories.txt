@@ -1,0 +1,5 @@
+/home/sergio/projects/Joystick/build/CMakeFiles/g1_joystick.dir
+/home/sergio/projects/Joystick/build/CMakeFiles/xbox_controller_test.dir
+/home/sergio/projects/Joystick/build/CMakeFiles/joy_mapping_example.dir
+/home/sergio/projects/Joystick/build/CMakeFiles/edit_cache.dir
+/home/sergio/projects/Joystick/build/CMakeFiles/rebuild_cache.dir

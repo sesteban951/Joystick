@@ -1,4 +1,4 @@
-#include "joystick/xbox_controller.h"
+#include "joy.h"
 #include <iostream>
 #include <unistd.h> // For sleep()
 #include <iomanip> // For std::setprecision()
@@ -10,7 +10,7 @@ int main()
     std::cout << std::setprecision(3);
 
     // create xbox controller instance
-    XboxController xbox;
+    Joystick xbox;
 
     // variables to be mapped
     bool state_cmd_initialize_robot = false; // SELECT

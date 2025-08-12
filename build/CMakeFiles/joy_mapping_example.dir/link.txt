@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -pthread -O3 -pthread CMakeFiles/joy_mapping_example.dir/tests/joy_mapping_example.cpp.o -o joy_mapping_example  -Wl,-rpath,/home/sergio/projects/Joystick/build libg1_joystick.so 
