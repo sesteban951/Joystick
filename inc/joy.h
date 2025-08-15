@@ -26,7 +26,7 @@ struct Axes {
     double DPAD_Y = 0.0;  // D-Pad Y-direction (Up is +), (-1.0, 0.0, 1.0)
 };
 
-// buttons struct
+// buttons struct, (false = not pressed, true = pressed)
 struct Buttons {
     bool A = false;
     bool B = false;

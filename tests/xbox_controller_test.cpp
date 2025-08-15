@@ -15,12 +15,13 @@ int main()
     Buttons buttons;
     Axes axes;
 
-    // if joystick is connected, start reading inputs
-    if (xbox.isConnected())
-    {
-        while (true) 
-        {
-            xbox.update();
+    while (true) {
+
+        // Update the joystick state
+        xbox.update();
+
+        // if joystick is connected, start reading inputs
+        if (xbox.isConnected()){
 
             buttons = xbox.buttons;
             axes = xbox.axes;
@@ -48,6 +49,9 @@ int main()
             }
 
             usleep(10000); // Sleep for 1ms to avoid excessive CPU usage
+        }
+        else {
+            std::cout << "Joystick not connected." << std::endl;
         }
     }
 
